@@ -1,0 +1,25 @@
+{
+    "name": "awethemes/wp-object",
+    "description": "Completely OOP for WordPress objects",
+    "type": "library",
+    "license": "MIT",
+    "minimum-stability": "stable",
+    "authors": [
+        {
+            "name": "awethemes",
+            "email": "support@awethemes.com"
+        },
+        {
+            "name": "Nguyen Van Anh",
+            "email": "anhskohbo@gmail.com"
+        }
+    ],
+    "require": {
+        "php": ">=5.4.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Awethemes\\WP_Object\\": "src/"
+        }
+    }
+}
