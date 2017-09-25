@@ -7,6 +7,15 @@ Completely OOP for WordPress objects
 - Provide an abstract layer for working with WordPress objects (post, CPT, taxonomy, etc...) with fluent
 API for create, update and delete.
 - Support WordPress meta-data with `mappings` for automatic update.
+- And more..
+
+## Install
+
+Install via composer
+
+```
+composer require awethemes/wp-object
+```
 
 ## Examples:
 
