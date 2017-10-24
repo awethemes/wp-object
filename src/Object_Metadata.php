@@ -79,10 +79,22 @@ trait Object_Metadata {
 	 *
 	 * @param  string $meta_key   Metadata key.
 	 * @param  mixed  $meta_value Metadata value. Must be serializable if non-scalar.
-	 * @return bool|int
+	 * @return bool
 	 */
 	public function update_meta( $meta_key, $meta_value ) {
-		return update_metadata( $this->meta_type, $this->get_id(), $meta_key, $meta_value );
+		$updated = update_metadata( $this->meta_type, $this->get_id(), $meta_key, $meta_value );
+
+		if ( false !== $updated ) {
+			$this->metadata[ $meta_key ] = $meta_value;
+
+			if ( $attribute = $this->get_mapping_attribute( $meta_key ) ) {
+				$this->set_attribute( $attribute, $meta_value );
+			}
+
+			return true;
+		}
+
+		return false;
 	}
 
 	/**
@@ -178,6 +190,18 @@ trait Object_Metadata {
 	}
 
 	/**
+	 * Get the mapping attribute by special metakey.
+	 *
+	 * @param  string $metakey The metakey key to get attribute.
+	 * @return string|null
+	 */
+	public function get_mapping_attribute( $metakey ) {
+		$mapping = array_flip( $this->get_mapping() );
+
+		return isset( $mapping[ $metakey ] ) ? $mapping[ $metakey ] : null;
+	}
+
+	/**
 	 * Get normalized of mapping.
 	 *
 	 * @return array
@@ -223,7 +247,10 @@ trait Object_Metadata {
 		}
 
 		$mapping = $this->get_mapping();
-		$changes = $this->get_changes_only( $changes, array_keys( $mapping ) );
+
+		$changes = $this->recently_created
+			? array_keys( $mapping )
+			: $this->get_changes_only( $changes, array_keys( $mapping ) );
 
 		// Don't do anything if nothing changes.
 		if ( empty( $changes ) ) {
@@ -231,15 +258,17 @@ trait Object_Metadata {
 		}
 
 		$updated = [];
-
 		foreach ( $changes as $attribute ) {
 			$meta_key = $this->get_mapping_metakey( $attribute );
+			if ( is_null( $meta_key ) ) {
+				continue;
+			}
 
 			$meta_value = $this->sanitize_attribute( $attribute,
 				$this->get_attribute( $attribute )
 			);
 
-			if ( $meta_key && $this->update_meta( $meta_key, $meta_value ) ) {
+			if ( $this->update_meta( $meta_key, $meta_value ) ) {
 				$updated[] = $attribute;
 			}
 		}

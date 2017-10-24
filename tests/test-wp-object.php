@@ -186,6 +186,18 @@ class WP_Object_Test extends WP_UnitTestCase {
 		$this->assertEquals($a['description'], 'Season 8');
 		$this->assertEquals(get_post_meta($a->get_id(), '_number_release', true), '08-2018');
 	}
+
+	public function testSaveEmptyMeta() {
+		$object = new AweBooking_Post_WP_Object;
+		$object['title'] = '1';
+		$object['episodes'] = null;
+		$object['release'] = '';
+		$object->save();
+
+		$this->assertTrue($object->get_id() > 0);
+		$this->assertTrue(metadata_exists( 'post', $object->get_id(), '_number_of_episodes' ));
+		$this->assertTrue(metadata_exists( 'post', $object->get_id(), '_number_release' ));
+	}
 }
 
 class AweBooking_Post_WP_Object extends WP_Object {
