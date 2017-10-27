@@ -114,7 +114,7 @@ trait Object_Attributes {
 	 */
 	public function fill( array $attributes ) {
 		foreach ( $attributes as $key => $value ) {
-			if ( ! isset( $this->attributes[ $key ] ) ) {
+			if ( ! array_key_exists( $key, $this->attributes ) ) {
 				continue;
 			}
 
