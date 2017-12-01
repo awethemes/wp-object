@@ -104,7 +104,7 @@ trait Object_Metadata {
 	 * @return bool
 	 */
 	public function delete_meta( $meta_key ) {
-		return delete_metadata( $this->meta_type, $this->get_id(), $meta_key, '', true );
+		return delete_metadata( $this->meta_type, $this->get_id(), $meta_key, '', false );
 	}
 
 	/**
