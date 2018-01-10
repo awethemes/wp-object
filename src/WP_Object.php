@@ -501,7 +501,7 @@ abstract class WP_Object implements ArrayAccess, JsonSerializable {
 			return;
 		}
 
-		if ( doing_action( 'save_post' ) ) {
+		if ( doing_action( 'save_post' ) || 0 === strpos( current_action(), 'save_post' ) ) {
 			$updated = $wpdb->update( $wpdb->posts, $post_data, [ 'ID' => $this->get_id() ] );
 			clean_post_cache( $this->get_id() );
 		} else {
