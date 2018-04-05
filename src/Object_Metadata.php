@@ -264,11 +264,7 @@ trait Object_Metadata {
 				continue;
 			}
 
-			$meta_value = $this->sanitize_attribute( $attribute,
-				$this->get_attribute( $attribute )
-			);
-
-			if ( $this->update_meta( $meta_key, $meta_value ) ) {
+			if ( $this->update_meta( $meta_key, $this->get_attribute( $attribute ) ) ) {
 				$updated[] = $attribute;
 			}
 		}

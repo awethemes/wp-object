@@ -65,18 +65,7 @@ abstract class WP_Object implements ArrayAccess, JsonSerializable {
 	 * @param mixed $object Object ID we'll working for.
 	 */
 	public function __construct( $object = 0 ) {
-		if ( is_numeric( $object ) && $object > 0 ) {
-			$this->id = (int) $object;
-		} elseif ( 'post' === $this->meta_type && ! empty( $object->ID ) ) {
-			$this->id = (int) $object->ID;
-		} elseif ( 'term' === $this->meta_type && ! empty( $object->term_id ) ) {
-			$this->id = (int) $object->term_id;
-		} elseif ( $object instanceof WP_Object ) {
-			$this->id = $object->get_id();
-		}
-
-		// TODO: ...
-		$this->boot_traits();
+		$this->id = static::parse_object_id( $object );
 
 		// Setup the wp core object instance.
 		if ( ! is_null( $this->id ) ) {
@@ -95,20 +84,20 @@ abstract class WP_Object implements ArrayAccess, JsonSerializable {
 	}
 
 	/**
-	 * Loop through traits and call boot method.
+	 * Parse the object_id.
 	 *
-	 * @return void
+	 * @param  mixed $object The object.
+	 * @return int|null
 	 */
-	protected function boot_traits() {
-		$traits = class_uses( $this );
-
-		foreach ( $traits as $trait ) {
-			$reflect = new \ReflectionClass( $trait );
-			$method  = 'boot_' . str_replace( '_trait', '', strtolower( $reflect->getShortName() ) );
-
-			if ( method_exists( $this, $method ) ) {
-				call_user_func( [ $this, $method ] );
-			}
+	public static function parse_object_id( $object ) {
+		if ( is_numeric( $object ) && $object > 0 ) {
+			return (int) $object;
+		} elseif ( 'post' === $this->meta_type && ! empty( $object->ID ) ) {
+			return (int) $object->ID;
+		} elseif ( 'term' === $this->meta_type && ! empty( $object->term_id ) ) {
+			return (int) $object->term_id;
+		} elseif ( $object instanceof self ) {
+			return $object->get_id();
 		}
 	}
 
@@ -117,7 +106,7 @@ abstract class WP_Object implements ArrayAccess, JsonSerializable {
 	 *
 	 * @return void
 	 */
-	abstract protected function setup();
+	protected function setup() {}
 
 	/**
 	 * Setup WP Core Object based on ID and object-type.
@@ -503,10 +492,11 @@ abstract class WP_Object implements ArrayAccess, JsonSerializable {
 
 		if ( doing_action( 'save_post' ) || 0 === strpos( current_action(), 'save_post' ) ) {
 			$updated = $wpdb->update( $wpdb->posts, $post_data, [ 'ID' => $this->get_id() ] );
-			clean_post_cache( $this->get_id() );
 		} else {
 			$updated = wp_update_post( array_merge( [ 'ID' => $this->get_id() ], $post_data ) );
 		}
+
+		clean_post_cache( $this->get_id() );
 
 		return ( 0 !== $updated && false !== $updated );
 	}
@@ -616,14 +606,7 @@ abstract class WP_Object implements ArrayAccess, JsonSerializable {
 	 * @return string
 	 */
 	public function to_json( $options = 0 ) {
-		$json = json_encode( $this->jsonSerialize(), $options );
-
-		if ( JSON_ERROR_NONE !== json_last_error() ) {
-			// TODO: Logging or throw the error message if happend,
-			// using json_last_error_msg(); function to get error message.
-		}
-
-		return $json;
+		return json_encode( $this->jsonSerialize(), $options );
 	}
 
 	/**

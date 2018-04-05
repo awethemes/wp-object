@@ -76,7 +76,7 @@ trait Object_Attributes {
 		}
 
 		// If not just set attribute by normally.
-		$this->attributes[ $key ] = $value;
+		$this->attributes[ $key ] = $this->sanitize_attribute( $key, $value );
 
 		return $this;
 	}
@@ -313,6 +313,42 @@ trait Object_Attributes {
 	}
 
 	/**
+	 * Get the casts array.
+	 *
+	 * @return array
+	 */
+	public function get_casts() {
+		return $this->casts;
+	}
+
+	/**
+	 * Determine whether an attribute should be cast to a native type.
+	 *
+	 * @param  string            $key   A string of attribute key.
+	 * @param  array|string|null $types Optional, list of possible types.
+	 * @return bool
+	 */
+	public function has_cast( $key, $types = null ) {
+		if ( array_key_exists( $key, $this->get_casts() ) ) {
+			return $types ? in_array( $this->get_cast_type( $key ), (array) $types, true ) : true;
+		}
+
+		return false;
+	}
+
+	/**
+	 * Get the type of cast for a attribute.
+	 *
+	 * @param  string $key A string of attribute key.
+	 * @return string
+	 */
+	protected function get_cast_type( $key ) {
+		$casts = $this->get_casts();
+
+		return trim( strtolower( $casts[ $key ] ) );
+	}
+
+	/**
 	 * Cast an attribute to a native PHP type.
 	 *
 	 * @param  string $key   A string of attribute key.
@@ -345,43 +381,7 @@ trait Object_Attributes {
 	}
 
 	/**
-	 * Determine whether an attribute should be cast to a native type.
-	 *
-	 * @param  string            $key   A string of attribute key.
-	 * @param  array|string|null $types Optional, list of possible types.
-	 * @return bool
-	 */
-	public function has_cast( $key, $types = null ) {
-		if ( array_key_exists( $key, $this->get_casts() ) ) {
-			return $types ? in_array( $this->get_cast_type( $key ), (array) $types, true ) : true;
-		}
-
-		return false;
-	}
-
-	/**
-	 * Get the type of cast for a attribute.
-	 *
-	 * @param  string $key A string of attribute key.
-	 * @return string
-	 */
-	protected function get_cast_type( $key ) {
-		$casts = $this->get_casts();
-
-		return trim( strtolower( $casts[ $key ] ) );
-	}
-
-	/**
-	 * Get the casts array.
-	 *
-	 * @return array
-	 */
-	public function get_casts() {
-		return $this->casts;
-	}
-
-	/**
-	 * Santize attribute value before save.
+	 * Santize attribute value before set.
 	 *
 	 * @param  string $key   Attribute key name.
 	 * @param  mixed  $value Attribute value.
