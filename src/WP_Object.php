@@ -92,11 +92,11 @@ abstract class WP_Object implements ArrayAccess, JsonSerializable {
 	public static function parse_object_id( $object ) {
 		if ( is_numeric( $object ) && $object > 0 ) {
 			return (int) $object;
-		} elseif ( 'post' === $this->meta_type && ! empty( $object->ID ) ) {
+		} elseif ( ! empty( $object->ID ) ) {
 			return (int) $object->ID;
-		} elseif ( 'term' === $this->meta_type && ! empty( $object->term_id ) ) {
+		} elseif ( ! empty( $object->term_id ) ) {
 			return (int) $object->term_id;
-		} elseif ( $object instanceof self ) {
+		} elseif ( $object instanceof WP_Object ) {
 			return $object->get_id();
 		}
 	}
