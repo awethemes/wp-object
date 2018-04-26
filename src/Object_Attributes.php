@@ -67,15 +67,6 @@ trait Object_Attributes {
 	 * @return $this
 	 */
 	public function set_attribute( $key, $value ) {
-		$method = 'set_' . str_replace( '-', '_', $key );
-
-		// First, we'll check present of `set_$key()` method,
-		// if available just call that method.
-		if ( method_exists( $this, $method ) ) {
-			return $this->{$method}( $value );
-		}
-
-		// If not just set attribute by normally.
 		$this->attributes[ $key ] = $this->sanitize_attribute( $key, $value );
 
 		return $this;
