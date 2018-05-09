@@ -158,6 +158,10 @@ abstract class WP_Object implements ArrayAccess, JsonSerializable {
 		 */
 		do_action( $this->prefix( 'saving' ), $this );
 
+		if ( $this->recently_created ) {
+			$this->recently_created = false;
+		}
+
 		// Allow sub-class overwrite before_save method, here we can
 		// validate the attribute data before save or doing something else.
 		$this->before_save();
@@ -254,18 +258,18 @@ abstract class WP_Object implements ArrayAccess, JsonSerializable {
 		if ( count( $dirty ) > 0 ) {
 			$updated = $this->perform_update( $dirty );
 
-			if ( $updated ) {
-				/**
-				 * Fires updated action.
-				 *
-				 * @param static $wp_object Current object instance.
-				 */
-				do_action( $this->prefix( 'updated' ), $this );
-
-				$this->sync_changes();
+			if ( false === $updated ) {
+				return false;
 			}
 
-			return (bool) $updated;
+			/**
+			 * Fires updated action.
+			 *
+			 * @param static $wp_object Current object instance.
+			 */
+			do_action( $this->prefix( 'updated' ), $this );
+
+			$this->sync_changes();
 		}
 
 		return true;
