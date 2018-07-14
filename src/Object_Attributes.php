@@ -150,7 +150,7 @@ trait Object_Attributes {
 	 * @return $this
 	 */
 	public function sync_original_attribute( $attribute ) {
-		if ( array_key_exists( $attributes, $this->attributes ) ) {
+		if ( array_key_exists( $attribute, $this->attributes ) ) {
 			$this->original[ $attribute ] = $this->attributes[ $attribute ];
 		}
 
@@ -164,7 +164,7 @@ trait Object_Attributes {
 	 * @return $this
 	 */
 	public function revert_attribute( $attribute ) {
-		if ( array_key_exists( $attributes, $this->attributes ) ) {
+		if ( array_key_exists( $attribute, $this->attributes ) ) {
 			$this->attributes[ $attribute ] = $this->original[ $attribute ];
 		}
 
